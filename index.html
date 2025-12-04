@@ -1,19 +1,42 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kaizen Flow - Zona de Hábitos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Second Brain OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      // Polyfill para evitar crash 'process is not defined' em browsers/Vercel
-      window.process = window.process || { env: { API_KEY: '' } };
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              slate: {
+                850: '#151f32',
+                950: '#020617',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <script>
+      // Robust Polyfill for Vercel/Browser environments
+      window.process = window.process || {};
+      window.process.env = window.process.env || {};
+      // If Vercel injects env vars differently, handle it here if needed, 
+      // but usually the build process handles replacement. 
+      // This prevents 'undefined' access errors.
     </script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #f8fafc;
+        /* Default to dark mode background to prevent flash */
+        background-color: #020617; 
       }
       /* Custom scrollbar for aesthetics */
       ::-webkit-scrollbar {
@@ -23,11 +46,28 @@
         background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
+        background: #334155;
         border-radius: 3px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
+        background: #475569;
+      }
+      
+      .animate-fadeIn {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+      .animate-slideUp {
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
       }
     </style>
   <script type="importmap">
@@ -42,7 +82,7 @@
 }
 </script>
 </head>
-  <body>
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
     <div id="root"></div>
   </body>
 </html>

@@ -1,22 +1,38 @@
 import { GoogleGenAI } from "@google/genai";
 import { Habit } from "../types";
 
-// Safety check for process.env to prevent runtime crashes in browser environments
+// Helper to safely get API Key without crashing
 const getApiKey = () => {
-    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-        return process.env.API_KEY;
+    try {
+        // @ts-ignore - process might be undefined in browser
+        if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+            // @ts-ignore
+            return process.env.API_KEY;
+        }
+        // Fallback for polyfilled window.process
+        // @ts-ignore
+        if (typeof window !== 'undefined' && window.process && window.process.env && window.process.env.API_KEY) {
+             // @ts-ignore
+            return window.process.env.API_KEY;
+        }
+    } catch (e) {
+        return '';
     }
     return '';
 };
 
-const apiKey = getApiKey();
-// Only initialize if we have a key, though we can instantiate, calls will fail safely
-const ai = new GoogleGenAI({ apiKey: apiKey || 'dummy-key' });
-
 export const getKaizenAdvice = async (habits: Habit[]): Promise<string> => {
-  if (!apiKey) return "API Key missing. AI Systems Offline.";
+  const apiKey = getApiKey();
+  
+  if (!apiKey) {
+      console.warn("API Key not found. Please configure process.env.API_KEY");
+      return "Sistema Offline. Configure a API Key para análise tática.";
+  }
 
   try {
+    // Initialize ON DEMAND, not at app startup. This prevents white-screen crashes.
+    const ai = new GoogleGenAI({ apiKey: apiKey });
+
     const habitSummary = habits.map(h => 
       `PROTOCOL: ${h.title} | STREAK: ${h.streak} | STATUS: ${h.completedDates.includes(new Date().toISOString().split('T')[0]) ? 'EXECUTED' : 'PENDING'}`
     ).join('\n');
@@ -38,9 +54,9 @@ export const getKaizenAdvice = async (habits: Habit[]): Promise<string> => {
       contents: prompt,
     });
 
-    return response.text || "Systems nominal. Continue execution.";
+    return response.text || "Sistemas nominais. Continue a execução.";
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "Connection failed. Focus on manual execution.";
+    return "Falha na conexão neural. Foque na execução manual.";
   }
 };

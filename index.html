@@ -27,16 +27,13 @@
       // Robust Polyfill for Vercel/Browser environments
       window.process = window.process || {};
       window.process.env = window.process.env || {};
-      // If Vercel injects env vars differently, handle it here if needed, 
-      // but usually the build process handles replacement. 
-      // This prevents 'undefined' access errors.
     </script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
       body {
         font-family: 'Inter', sans-serif;
-        /* Default to dark mode background to prevent flash */
-        background-color: #020617; 
+        background-color: #020617; /* Slate 950 */
+        color: #f8fafc; /* Slate 50 */
       }
       /* Custom scrollbar for aesthetics */
       ::-webkit-scrollbar {
@@ -76,13 +73,12 @@
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
     "react/": "https://aistudiocdn.com/react@^19.2.1/",
     "react": "https://aistudiocdn.com/react@^19.2.1",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
     "recharts": "https://aistudiocdn.com/recharts@^3.5.1"
   }
 }
 </script>
 </head>
-  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+  <body class="bg-slate-950 text-white selection:bg-indigo-500 selection:text-white">
     <div id="root"></div>
   </body>
 </html>

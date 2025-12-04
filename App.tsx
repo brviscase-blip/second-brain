@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Habit, ViewState, HabitCategory, Theme, COLORS } from './types';
 import HabitCard from './components/HabitCard';
 import Dashboard from './components/Dashboard';
-import { ListIcon, BarChartIcon, PlusIcon, SunIcon, MoonIcon, BellIcon, ClockIcon } from './components/Icons';
+import { ListIcon, BarChartIcon, PlusIcon, SunIcon, MoonIcon, ClockIcon } from './components/Icons';
 
 const App: React.FC = () => {
   // --- STATE ---
   const [habits, setHabits] = useState<Habit[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
+    // Safe initialization
+    try {
+      if (typeof window !== 'undefined') {
         const saved = localStorage.getItem('second_brain_db');
         if (saved) return JSON.parse(saved);
-      } catch (e) {
-        console.error("Data corruption in local storage, resetting db.");
       }
+    } catch (e) {
+      console.error("Data corruption in local storage, resetting db.", e);
     }
     // Default Starter Habits
     return [
@@ -47,11 +48,16 @@ const App: React.FC = () => {
 
   const [view, setView] = useState<ViewState>('habits');
   
-  // Theme State
+  // Theme State - Defaulting to Dark for that "Hacker/Business" feel
   const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem('theme') as Theme;
-        return saved || 'dark';
+    try {
+      if (typeof window !== 'undefined') {
+          const saved = localStorage.getItem('theme') as Theme;
+          // Verify it's a valid value
+          if (saved === 'light' || saved === 'dark') return saved;
+      }
+    } catch(e) {
+      console.warn("Theme load error", e);
     }
     return 'dark';
   });
@@ -68,14 +74,19 @@ const App: React.FC = () => {
 
   // --- EFFECTS ---
 
-  // Apply theme
+  // Apply theme immediately on mount and change
   useEffect(() => {
+    const root = document.documentElement;
     if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
+        root.classList.add('dark');
+        root.style.colorScheme = 'dark';
     } else {
-        document.documentElement.classList.remove('dark');
+        root.classList.remove('dark');
+        root.style.colorScheme = 'light';
     }
-    localStorage.setItem('theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch(e) {}
   }, [theme]);
 
   // Persist habits
@@ -124,24 +135,18 @@ const App: React.FC = () => {
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   const calculateStreak = (completedDates: string[]): number => {
-    if (completedDates.length === 0) return 0;
+    if (!completedDates || completedDates.length === 0) return 0;
     const sorted = [...completedDates].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
     
-    let streak = 0;
-    let checkDate = new Date();
-    const lastCompleted = sorted[0];
-    
     // Check if streak is alive (completed today or yesterday)
+    const lastCompleted = sorted[0];
     if (lastCompleted !== today && lastCompleted !== yesterday) {
-        // Technically streak is 0 if not done yesterday, but visually we might want to show previous streak
-        // strictly speaking, streak resets if you miss a day.
         return 0; 
     }
 
-    // Simple consecutive day check (ignoring frequency gaps for simplicity in this version)
-    // A robust system would check frequency, but for now we count consecutive logged days.
+    let streak = 0;
     let currentCheck = new Date(lastCompleted);
     
     for (let i = 0; i < sorted.length; i++) {
@@ -221,7 +226,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 flex flex-col max-w-md mx-auto shadow-2xl relative transition-colors duration-500 font-sans border-x border-slate-200 dark:border-slate-800">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 flex flex-col max-w-md mx-auto shadow-2xl relative transition-colors duration-500 font-sans border-x border-slate-200 dark:border-slate-900">
       
       {/* Header */}
       <header className="px-6 py-6 pt-10 z-10 flex justify-between items-center bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md sticky top-0 border-b border-slate-100 dark:border-slate-900">

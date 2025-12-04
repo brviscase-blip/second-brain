@@ -1,25 +1,36 @@
 import { GoogleGenAI } from "@google/genai";
 import { Habit } from "../types";
 
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+// Safety check for process.env to prevent runtime crashes in browser environments
+const getApiKey = () => {
+    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+        return process.env.API_KEY;
+    }
+    return '';
+};
+
+const apiKey = getApiKey();
+// Only initialize if we have a key, though we can instantiate, calls will fail safely
+const ai = new GoogleGenAI({ apiKey: apiKey || 'dummy-key' });
 
 export const getKaizenAdvice = async (habits: Habit[]): Promise<string> => {
-  if (!apiKey) return "Configure sua API Key para receber conselhos personalizados.";
+  if (!apiKey) return "API Key missing. AI Systems Offline.";
 
   try {
     const habitSummary = habits.map(h => 
-      `- ${h.title}: Ofensiva de ${h.streak} dias. ${h.completedDates.includes(new Date().toISOString().split('T')[0]) ? 'Feito hoje.' : 'Pendente hoje.'}`
+      `PROTOCOL: ${h.title} | STREAK: ${h.streak} | STATUS: ${h.completedDates.includes(new Date().toISOString().split('T')[0]) ? 'EXECUTED' : 'PENDING'}`
     ).join('\n');
 
     const prompt = `
-      Atue como um mentor experiente na filosofia Kaizen (melhoria contínua).
-      Analise os seguintes hábitos e o desempenho atual do usuário:
+      You are the "Second Brain" AI, a ruthless high-performance strategist. 
+      Your tone is professional, analytical, concise, and business-oriented. No fluff, no emotion.
+      
+      Analyze the following user protocols (habits) and execution status:
       ${habitSummary}
 
-      Forneça um conselho curto, motivacional e prático (máximo de 2 frases) focado em consistência e pequenos passos.
-      Se o usuário estiver indo bem, elogie a disciplina. Se estiver falhando, sugira uma micro-mudança.
-      Fale em Português do Brasil.
+      Output a single strategic insight or directive (max 2 sentences) in Portuguese (Brazil).
+      Focus on efficiency, system optimization, and discipline.
+      If performance is low, demand immediate correction. If high, acknowledge efficiency.
     `;
 
     const response = await ai.models.generateContent({
@@ -27,9 +38,9 @@ export const getKaizenAdvice = async (habits: Habit[]): Promise<string> => {
       contents: prompt,
     });
 
-    return response.text || "Continue com o bom trabalho! A consistência é a chave.";
+    return response.text || "Systems nominal. Continue execution.";
   } catch (error) {
-    console.error("Erro ao chamar Gemini:", error);
-    return "O foco hoje é apenas ser 1% melhor que ontem.";
+    console.error("Gemini Error:", error);
+    return "Connection failed. Focus on manual execution.";
   }
 };

@@ -14,58 +14,51 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onToggle, onDelete }) => {
 
   return (
     <div className={`
-      relative overflow-hidden p-4 rounded-xl border transition-all duration-300 shadow-sm
+      relative group p-0 border-l-4 transition-all duration-200
       ${isCompletedToday 
-        ? 'bg-emerald-50 border-emerald-200 shadow-emerald-100' 
-        : 'bg-white border-slate-200 hover:shadow-md'}
+        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10' 
+        : 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900'}
     `}>
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-              habit.category === 'Saúde' ? 'bg-blue-100 text-blue-700' :
-              habit.category === 'Aprendizado' ? 'bg-purple-100 text-purple-700' :
-              'bg-gray-100 text-gray-700'
-            }`}>
+      <div className="p-4 flex items-center justify-between border border-l-0 border-zinc-200 dark:border-zinc-800 h-full">
+        <div className="flex-1 pr-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400 dark:text-zinc-500">
               {habit.category}
             </span>
-            <div className="flex items-center text-orange-500 text-xs font-bold gap-1">
-              <FlameIcon className="w-3 h-3 fill-orange-500" />
-              <span>{habit.streak} dias</span>
-            </div>
+            {habit.streak > 0 && (
+                <div className="flex items-center text-zinc-600 dark:text-zinc-400 text-[10px] font-bold gap-1 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded-sm">
+                <FlameIcon className="w-3 h-3" />
+                <span>{habit.streak} DAY STREAK</span>
+                </div>
+            )}
           </div>
-          <h3 className={`font-bold text-lg ${isCompletedToday ? 'text-emerald-800' : 'text-slate-800'}`}>
+          <h3 className={`font-bold text-base uppercase tracking-tight ${isCompletedToday ? 'text-emerald-700 dark:text-emerald-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
             {habit.title}
           </h3>
-          {habit.description && <p className="text-slate-500 text-sm mt-0.5">{habit.description}</p>}
+          {habit.description && <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-1">{habit.description}</p>}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
             <button 
                 onClick={() => onDelete(habit.id)}
-                className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                title="Excluir hábito"
+                className="opacity-0 group-hover:opacity-100 p-2 text-zinc-300 hover:text-red-500 transition-all"
+                title="Archive Protocol"
             >
                 <TrashIcon className="w-4 h-4" />
             </button>
             <button
                 onClick={() => onToggle(habit.id)}
                 className={`
-                w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500
+                w-10 h-10 border-2 flex items-center justify-center transition-all duration-200 rounded-md
                 ${isCompletedToday 
-                    ? 'bg-emerald-500 text-white scale-110 rotate-0' 
-                    : 'bg-slate-100 text-slate-300 hover:bg-slate-200 rotate-180'}
+                    ? 'bg-emerald-600 border-emerald-600 text-white' 
+                    : 'bg-transparent border-zinc-300 dark:border-zinc-600 text-transparent hover:border-zinc-400 dark:hover:border-zinc-500'}
                 `}
             >
-                <CheckIcon className="w-6 h-6" />
+                <CheckIcon className="w-5 h-5" />
             </button>
         </div>
       </div>
-      
-      {/* Progress Bar Background Effect */}
-      {isCompletedToday && (
-        <div className="absolute bottom-0 left-0 h-1 bg-emerald-400 animate-slideRight w-full" />
-      )}
     </div>
   );
 };

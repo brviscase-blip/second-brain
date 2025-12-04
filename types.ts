@@ -9,11 +9,11 @@ export interface Habit {
 }
 
 export enum HabitCategory {
-  HEALTH = 'Saúde',
-  LEARNING = 'Aprendizado',
-  PRODUCTIVITY = 'Produtividade',
-  MINDFULNESS = 'Mindfulness',
-  OTHER = 'Outro',
+  BIO_HACKING = 'BIO-OPTIMIZATION',
+  DEEP_WORK = 'DEEP WORK',
+  SKILL_ACQUISITION = 'SKILL ACQ',
+  SYSTEMS = 'SYSTEMS',
+  STRATEGY = 'STRATEGY',
 }
 
 export interface DayStatus {
@@ -23,3 +23,4 @@ export interface DayStatus {
 }
 
 export type ViewState = 'habits' | 'dashboard' | 'add';
+export type Theme = 'light' | 'dark';

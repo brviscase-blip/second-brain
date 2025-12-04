@@ -15,7 +15,6 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ habits }) => {
-  // Calculate completion for the last 7 days
   const getLast7DaysData = () => {
     const data = [];
     const today = new Date();
@@ -33,7 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({ habits }) => {
       });
 
       data.push({
-        day: date.toLocaleDateString('pt-BR', { weekday: 'short' }),
+        day: date.toLocaleDateString('pt-BR', { weekday: 'narrow' }).toUpperCase(),
         completed: completedCount,
         fullDate: dateStr
       });
@@ -47,27 +46,27 @@ const Dashboard: React.FC<DashboardProps> = ({ habits }) => {
 
   return (
     <div className="space-y-6 animate-fadeIn">
+      {/* Metric Cards */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-slate-500 text-xs font-medium uppercase">Hoje</p>
-          <div className="flex items-end gap-2 mt-1">
-            <span className="text-3xl font-bold text-slate-800">{totalCompletedToday}/{habits.length}</span>
-            <span className="text-sm text-slate-400 mb-1">hábitos</span>
+        <div className="bg-white dark:bg-zinc-900 p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg">
+          <p className="text-zinc-500 dark:text-zinc-500 text-[10px] font-bold tracking-widest uppercase">Daily Execution</p>
+          <div className="flex items-end gap-2 mt-2">
+            <span className="text-3xl font-black text-zinc-900 dark:text-white leading-none">{totalCompletedToday}<span className="text-zinc-300 dark:text-zinc-600">/</span>{habits.length}</span>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-slate-500 text-xs font-medium uppercase">Taxa</p>
-          <div className="flex items-end gap-2 mt-1">
-            <span className={`text-3xl font-bold ${completionRate >= 80 ? 'text-emerald-500' : 'text-indigo-500'}`}>
+        <div className="bg-white dark:bg-zinc-900 p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg">
+          <p className="text-zinc-500 dark:text-zinc-500 text-[10px] font-bold tracking-widest uppercase">Efficiency Rate</p>
+          <div className="flex items-end gap-2 mt-2">
+            <span className={`text-3xl font-black leading-none ${completionRate >= 80 ? 'text-emerald-600 dark:text-emerald-500' : 'text-zinc-900 dark:text-zinc-200'}`}>
               {completionRate}%
             </span>
-            <span className="text-sm text-slate-400 mb-1">concluído</span>
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 className="font-bold text-slate-800 mb-6">Consistência (7 Dias)</h3>
+      {/* Chart */}
+      <div className="bg-white dark:bg-zinc-900 p-6 border border-zinc-200 dark:border-zinc-800 rounded-lg">
+        <h3 className="font-bold text-xs text-zinc-500 uppercase tracking-widest mb-6">7-Day Performance Output</h3>
         <div className="h-48 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
@@ -75,17 +74,28 @@ const Dashboard: React.FC<DashboardProps> = ({ habits }) => {
                 dataKey="day" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                tick={{ fill: '#71717a', fontSize: 10, fontWeight: 700 }} 
                 dy={10}
               />
               <YAxis hide />
               <Tooltip 
-                cursor={{ fill: '#f1f5f9' }}
-                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                cursor={{ fill: 'transparent' }}
+                contentStyle={{ 
+                    backgroundColor: '#18181b', 
+                    color: '#fff', 
+                    borderRadius: '0px', 
+                    border: 'none', 
+                    fontSize: '12px',
+                    textTransform: 'uppercase'
+                }}
               />
-              <Bar dataKey="completed" radius={[4, 4, 0, 0]} animationDuration={1000}>
+              <Bar dataKey="completed" radius={[2, 2, 0, 0]} animationDuration={1000} barSize={32}>
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fullDate === new Date().toISOString().split('T')[0] ? '#10b981' : '#6366f1'} />
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.fullDate === new Date().toISOString().split('T')[0] ? '#2563eb' : '#3f3f46'} 
+                    className="dark:fill-zinc-700 hover:fill-zinc-900 dark:hover:fill-zinc-500 transition-all"
+                  />
                 ))}
               </Bar>
             </BarChart>
@@ -93,11 +103,12 @@ const Dashboard: React.FC<DashboardProps> = ({ habits }) => {
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
-        <h3 className="font-bold text-lg mb-2">Filosofia Kaizen</h3>
-        <p className="text-indigo-100 text-sm leading-relaxed">
-          "Pequenas melhorias diárias criam grandes resultados ao longo do tempo."
-          Não quebre a corrente. Se falhar um dia, recupere-se imediatamente no próximo.
+      {/* Philosophy Card */}
+      <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 bg-zinc-50 dark:bg-black">
+        <h3 className="font-bold text-xs uppercase tracking-widest mb-2 text-zinc-900 dark:text-zinc-200">System Note</h3>
+        <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed font-mono">
+          Consistency is the only metric that matters. Do not break the chain. 
+          Optimize your daily workflow to ensure 100% protocol adherence.
         </p>
       </div>
     </div>

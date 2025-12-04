@@ -13,9 +13,9 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onToggle, onDelete }) => {
   const today = new Date().toISOString().split('T')[0];
   const isCompletedToday = habit.completedDates.includes(today);
   
-  // Resolve colors based on habit selection, default to indigo if missing
-  // @ts-ignore
-  const theme = COLOR_VARIANTS[habit.color] || COLOR_VARIANTS.indigo;
+  // Resolve colors safely
+  const colorKey = (habit.color in COLOR_VARIANTS) ? (habit.color as keyof typeof COLOR_VARIANTS) : 'indigo';
+  const theme = COLOR_VARIANTS[colorKey];
 
   const renderHistoryGrid = () => {
     const days = [];
@@ -47,7 +47,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onToggle, onDelete }) => {
   };
 
   return (
-    <div className="relative group mb-3 px-1">
+    <div className="relative group mb-3 px-1 animate-fadeIn">
       <div className={`
         relative overflow-hidden transition-all duration-300 ease-out
         rounded-2xl border
